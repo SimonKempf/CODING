@@ -1,0 +1,12 @@
+{
+    "name": "ma-todolist",
+    "version": "0.1.0",
+    "dependencies": {
+        "ejs": "~2.1.4",
+        "express": "~3.3.4",
+        "socket.io": "~2.0.3",
+        "ent": "~0.1.0"
+    },
+    "author": "William Themens",
+    "description": "Un gestionnaire de todolist ultra basique"
+}

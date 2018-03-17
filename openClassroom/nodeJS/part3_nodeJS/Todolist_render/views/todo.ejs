@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Ma todolist</title>
+        <style>
+            a {text-decoration: none; color: black;}
+        </style>
+    </head>
+
+    <body>
+        <h1>Ma todolist</h1>
+
+        <ul id="listTodo">
+
+        </ul>
+
+        <form action="#" method="post" id="todoForm">
+            <p>
+                <label for="newtodo">Que dois-je faire ?</label>
+                <input type="text" name="newtodo" id="newtodo" autofocus />
+                <input type="submit" />
+            </p>
+        </form>
+        <script src="/js/jquery-3.3.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            $(document).ready(() => {
+                var socket = io.connect("http://localhost:8080");
+
+                $("#todoForm").submit(() => {
+                    let todo = $("#newtodo").val();
+                    socket.emit('add', todo);
+                    $("#newtodo").val("").focus();
+                    return false;
+                });
+
+                $(".todoEl").click((event) => {
+                    let id = $(event.target).attr('id');
+                    socket.emit('delete', id);
+                });
+
+                socket.on('todolist', (todoListe) => {
+                    console.log(todoListe); //Récéption de la liste
+                    $("#listTodo").html("");
+                    todoListe.forEach((item, index) => {
+                        $("#listTodo").append('<li><a class="todoEl" id="' + index + '">✘</a>' + item + '</li>');
+                    });
+                });
+            });
+
+        </script>
+    </body>
+</html>

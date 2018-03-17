@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Socket.io</title>
+    </head>
+ 
+    <body>
+        <h1>Communication avec socket.io !</h1>
+
+        <p><input type="button" value="Embêter le serveur" id="poke" /></p>
+
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script> 
+        <!-- Dans un premier temps, on fait récupérer au client le fichier socket.io.js. Celui-ci est automatiquement fourni par le serveur node.js via le module socket.io -->
+        <script>
+            var socket = io.connect('http://localhost:8080'); 
+            //  permet de communiquer avec le serveur en temps réel via socket.io
+            /* 
+             code JavaScript à la fin du code HTML volontairement
+            mais le placer à la fin du code HTML permet d'éviter que le chargement du JavaScript ne bloque le chargement de la page HTML. Au final, cela donne l'impression d'une page web qui se charge plus rapidement.
+            */
+
+            // On affiche une boîte de dialogue quand le serveur nous envoie un "message"
+            socket.on('message', function(message) {
+                alert('Le serveur a un message pour vous : ' + message);
+            })
+            /*
+            Avec socket.on(), on écoute les messages de type "message". Lorsque des messages arrivent, on appelle la fonction de callback qui, ici, affiche simplement une boîte de dialogue.
+            */
+            // Lorsqu'on clique sur le bouton, on envoie un message de type "message" au serveur, assorti d'un contenu.
+            $('#poke').click(function () {
+                socket.emit('message', 'Salut serveur, ça va ?');
+            })
+            
+
+            // partie de broadcast :
+            //on demande le pseudo au visiteur
+            var pseudo = prompt('Quel est votre pseudo ?');
+            // Et on l'envoie avec le signal "petit_nouveau" (pour le différencier de "message")
+            socket.emit('petit_nouveau', pseudo);
+
+
+        </script>
+    </body>
+</html>

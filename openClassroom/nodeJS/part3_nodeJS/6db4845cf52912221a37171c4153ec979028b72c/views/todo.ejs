@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>Ma todolist</title>
+</head>
+<body>
+	<h1>Ma todolist</h1>
+	<div>
+		<ul id="todolist">
+			<% todolist.forEach(function(todo, index){ %>
+				<li id="<%= index %>">
+					<div class="todoSummary">
+						<span class="task"><%= todo %></span>
+						<button type="button" class="modifier" value="<%= index %>">Modifier</button>
+						<button type="button" class="supprimer" value="<%= index %>">Supprimer</button>
+					</div>
+				</li>
+			<% }); %>
+		</ul>
+	</div>
+
+	<form action="/" method="post" id="formulaire_ajouter">
+		<label for="newtodo">Que dois-je faire ?</label>
+		<input type="text" name="newtodo" id="newtodo" />
+		<input type="submit" />
+	</form>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.slim.js"></script>
+	<script>
+		var socket = io.connect('http://localhost:8080');
+
+		socket.on('ajouter', function(task){
+			insertTask(task);
+		})
+
+		$("#formulaire_ajouter").submit(function(e){
+			e.preventDefault();
+			var newtodo = $("#newtodo").val();
+			socket.emit('ajouter', newtodo);
+			insertTask(newtodo)
+			$("#newtodo").val('');
+		})
+
+		function insertTask(task){
+			index = $("#todolist li").length;
+			while($("#"+index).length !=0){
+				index++;
+			}
+			$("#todolist").append('<li id="'+index+'"><div class="todoSummary"><span class="task">'+task+'</span> <button type="button" class="modifier" value="'+index+'">Modifier</button> <button type="button" class="supprimer" value="'+index+'">Supprimer</button></div></li>');
+		}
+
+		socket.on('supprimer', function(id){
+			deleteTask(id);
+		})
+
+		$("#todolist").on('click','button.supprimer',function(e){
+			id = $(this).val();
+			socket.emit('supprimer', id);
+			deleteTask(id);
+		})
+
+		function deleteTask(id){
+			$("#"+id).remove();
+		}
+
+		socket.on('modifier', function(update){
+			modifyTask(update["id"], update["task"]);
+		})
+
+		$("#todolist").on('click','button.modifier',function(e){
+			id = $(this).val();
+			form='<form action="/todo/modifier" method="post">'+
+				'<input type="text" name="updatetodo" id="updatetodo" value="'+$(this).siblings('.task').text()+'" />'+
+				'<input type="hidden" name="updateid" value="'+id+'" />'+
+				'<input type="submit" value="Modifier" />'+
+			'</form>';
+			$("#"+id+" .todoSummary").hide();
+			$("#"+id).append(form);
+		})
+
+		$("#todolist").on('submit','form',function(e){
+			e.preventDefault();
+			id = $(this).find('input[name=updateid]').val();
+			task = $(this).find('#updatetodo').val();
+			socket.emit('modifier', {id: id, task: task});
+			modifyTask(id, task);
+			$("#"+id+" .todoSummary").show();
+			$("#"+id).find("form").remove();
+		})
+
+		function modifyTask(id, task){
+			$("#"+id+" .task").text(task);
+		}
+
+	</script>
+</body>
+</html>

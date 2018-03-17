@@ -1,0 +1,17 @@
+Here we declared a controller called PhoneListController and registered it in an AngularJS module, phonecatApp. Notice that our ngApp directive (on the <html> tag) now specifies the phonecatApp module name as the module to load when bootstrapping the application.
+
+The data model (a simple array of phones in object literal notation) is now instantiated within the PhoneListController controller. The controller is simply a constructor function that takes a $scope parameter:
+
+The template (the part of the view containing the bindings and presentation logic) acts as a blueprint for how our data should be organized and presented to the user. The controller provides the context in which the bindings are evaluated and applies behavior and logic to our template.
+
+Since this combination (template + controller) is such a common and recurring pattern, AngularJS provides an easy and concise way to combine them together into reusable and isolated entities, known as components. Additionally, AngularJS will create a so called isolate scope for each instance of our component, which means no prototypal inheritance and no risk of our component affecting other parts of the application or vice versa.
+
+
+STEP 5:
+
+By virtue of the ngModel directive, this lets a user enter search criteria and immediately see the effects of their search on the phone list. This new code demonstrates the following:
+
+Data-binding: This is one of the core features in AngularJS. When the page loads, AngularJS binds the value of the input box to the data model variable specified with ngModel and keeps the two in sync.
+
+In this code, the data that a user types into the input box (bound to $ctrl.query) is immediately available as a filter input in the list repeater (phone in $ctrl.phones | filter:$ctrl.query). When changes to the data model cause the repeater's input to change, the repeater efficiently updates the DOM to reflect the current state of the model.
+
